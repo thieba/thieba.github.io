@@ -3,13 +3,38 @@ body {
     background-color: #233367;
     color: #A4783A;
     font-family: 'Roboto', serif;
+    margin: 0;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+header > h1 {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 
 .stack {
     --space: 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+  }
+
+  section:nth-child(even) {
+    background-color: #f7f2ea;
+  }
+
+  header {
+    display: flex;
+    place-content: center;
+  }
+
+  section, header {
+    padding: 1.5em;
+    min-height: 100vh;
   }
   
   .stack > * + * {
