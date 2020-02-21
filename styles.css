@@ -1,0 +1,20 @@
+body {
+    font-size: 2em;
+    background-color: #233367;
+    color: #A4783A;
+}
+
+.stack {
+    --space: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  .stack > * + * {
+    margin-top: var(--space);
+  }
+  
+  .stack > :nth-child(2) {
+    margin-bottom: auto;
+  }
