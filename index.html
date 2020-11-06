@@ -17,7 +17,8 @@
   }
 }
 body {
-margin: 0;
+	margin: 0;
+	background-color: #1f203e;
 }
 ul {
     margin: 0;
@@ -37,9 +38,13 @@ li {
     flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	background-color: #233367;
+	background: url(wall.png);
+	width: fit-content;
+	background-size: 100% 100%;
+    margin: auto;
 }
 #wall > div {
+	padding: 0 10px;
     justify-content: center;
     display: flex;
 	flex-grow: 1;
@@ -60,7 +65,7 @@ border-radius: 100px;
 text-align: center;
 border: solid 1px black;
 margin: 0px 1px;
-background-color: white;
+opacity: 0.5;
 }
 .hold-1 {
 background-color: var(--hold-1-color) !important;
@@ -80,6 +85,8 @@ background-color: var(--hold-4-color) !important;
 </head>
 <body>
 <header>
+	<h1 id="problemName">
+	</h1>
 </header>
 <div>
 	<ul id="problems">
@@ -164,7 +171,9 @@ function setHoldType(holds, type) {
 
 function setWall(index) {
 	resetWall();
-	const problemHolds = myWall.problems[index].holds;
+	const problem = myWall.problems[index];
+	problemName.innerHTML = problem.name;
+	const problemHolds = problem.holds;
 	setHoldType(problemHolds.starts, 1);
 	setHoldType(problemHolds.middles, 2);
 	setHoldType(problemHolds.finishes, 3);
@@ -188,6 +197,7 @@ function initializeWall(wall) {
 	}
 	drawWall();
 }
+
 const dbRefWall = firebase.database().ref().child('walls/jaimemebattre');
 dbRefWall.once('value', (snap) => initializeWall(snap.val()));
 </script>
