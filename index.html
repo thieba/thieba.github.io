@@ -1,30 +1,192 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <link rel="stylesheet" href="css/styles.css">
-        <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet" async>
-        <title>Arnaud Thiebault</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="Create your next app">
-    </head>
-    <body>
-        <div class="stack">
-            <header>
-                <h1>Arnaud THIEBAULT</h1>
-            </header>
-            <section>
-                <h1>Need a app ?</h1>
-                <p>This is a paragraph 1.</p>
-            </section>
-            <section>
-                <h1>2</h1>
-            </section>
-            <section>
-                <h1>3</h1>
-            </section>
-            <section>
-                <h1>4</h1>
-            </section>
-        </div>
-    </body>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<style>
+:root {
+	--hold-1-color: #27AE61;
+	--hold-2-color: #2C97DF;
+	--hold-3-color: #E84C3D;
+	--hold-4-color: #FF416D;
+	--header-height: 5rem;
+	--wall-columns: 15;
+	--wall-rows: 7;
+}
+@media screen and (max-width: 1000px) {
+  :root {
+    font-size: 1em;
+  }
+}
+body {
+margin: 0;
+}
+ul {
+    margin: 0;
+    padding: 0;
+}
+li {
+	border: solid 1px black;
+	background-color: grey;
+	padding: 1em;
+}
+#wall {
+    display: flex;
+	height: calc(98vh - var(--header-height));
+    flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background-color: black;
+}
+#wall > div {
+    justify-content: center;
+    display: flex;
+	flex-grow: 1;
+	width: calc(var(--wall-rows)*(100vh - var(--header-height))/ var(--wall-columns));
+}
+header {
+    width: 100%;
+    height: var(--header-height);
+    background-color: aqua;
+}
+span {
+//width: 2.4rem;
+flex-grow: 1;
+height: 100%;
+//height: 2.4rem;
+display: inline-block;
+border-radius: 100px;
+text-align: center;
+border: solid 1px black;
+margin: 0px 1px;
+background-color: white;
+}
+.hold-1 {
+background-color: var(--hold-1-color) !important;
+}
+.hold-2 {
+background-color: var(--hold-2-color) !important;
+}
+.hold-3 {
+background-color: var(--hold-3-color) !important;
+}
+.hold-4 {
+background-color: var(--hold-4-color) !important;
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+</head>
+<body>
+<header>
+</header>
+<div>
+	<ul id="problems">
+	</ul>
+</div>
+<div id="wall">
+</div>
+</body>
+<footer>
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyBmqA8z73bbjcv65MxWKDYFlzAmSqt0PFA",
+    authDomain: "myclimbingwall-fc0e9.firebaseapp.com",
+    databaseURL: "https://myclimbingwall-fc0e9.firebaseio.com",
+    projectId: "myclimbingwall-fc0e9",
+    storageBucket: "myclimbingwall-fc0e9.appspot.com",
+    messagingSenderId: "39971715404",
+    appId: "1:39971715404:web:2af0c94f84f0841b1337e9"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+<script>
+function onButtonClick() {
+let options = {acceptAllDevices: true};
+  console.log('Requesting Bluetooth Device...');
+  console.log('with ' + JSON.stringify(options));
+  navigator.bluetooth.requestDevice(options)
+  .then(device => {
+    console.log('> Name:             ' + device.name);
+    console.log('> Id:               ' + device.id);
+    console.log('> Connected:        ' + device.gatt.connected);
+  })
+  .catch(error => {
+    console.log('Argh! ' + error);
+  });
+}
+</script>
+<script>
+var myWall = { };
+const offsetx = 50;
+const offsety = 20;
+const holdTypes = 4;
+
+function setHold(index, type) {
+	let hold = document.getElementById(index);
+	hold.setAttribute('type', type);
+	hold.setAttribute('class', 'hold-'+type);
+}
+
+function drawWall() {
+console.log("column:" + myWall.columns + ", row:" + myWall.rows);
+	for (let y = 0; y < myWall.rows; y++) {
+			const div = document.createElement("DIV");
+			document.getElementById("wall").appendChild(div);
+		for (let x = 0; x < myWall.columns; x++) {
+			const span = document.createElement("SPAN");
+			span.id = x + y * myWall.columns;
+			span.onclick = () => {
+				let hold = document.getElementById(x + y * myWall.columns);
+				let type = hold.getAttribute('type');
+				type = type !== null ? (++type % (holdTypes + 1)) : 1;
+				setHold(x + y * myWall.columns, type);
+			};
+			div.appendChild(span);
+		}
+	}
+}
+
+function resetWall() {
+	for (let i = 0; i < (myWall.rows * myWall.columns); i++) {
+		setHold(i, 0);
+	}
+}
+
+function setHoldType(holds, type) {
+	for (let hold of holds ) {
+		setHold(hold, type);
+	}
+}
+
+function setWall(index) {
+	resetWall();
+	const problemHolds = myWall.problems[index].holds;
+	setHoldType(problemHolds.starts, 1);
+	setHoldType(problemHolds.middles, 2);
+	setHoldType(problemHolds.finishes, 3);
+	setHoldType(problemHolds.feet, 4);
+}
+
+function initializeWall(wall) {
+	console.log(wall);
+	myWall = wall;
+	let problemsElement = document.getElementById('problems');
+	for (let index in wall.problems) {
+		index = parseInt(index);
+		const problem = wall.problems[index];
+		console.log(problem);
+		const li = document.createElement('LI');
+		li.innerHTML =  problem.name + ' V' + problem.grade;
+		li.onclick = () => {
+			setWall(index);
+		};
+		problemsElement.appendChild(li);
+	}
+	drawWall();
+}
+const dbRefWall = firebase.database().ref().child('walls/jaimemebattre');
+dbRefWall.once('value', (snap) => initializeWall(snap.val()));
+</script>
+</footer>
 </html>
