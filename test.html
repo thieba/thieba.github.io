@@ -12,9 +12,7 @@ function log(str) {
 }
 
 function onBtnClick2() {
-	navigator.bluetooth.requestDevice({ filters: [
-        { namePrefix: 'LED' }, { optionalServices: ['19b10000-e8f2-537e-4f6c-d104768a1214']}
-    ] })
+	navigator.bluetooth.requestDevice({filters: [{services: ['19b10000-e8f2-537e-4f6c-d104768a1214']}]})
 	.then(device => {
 		log('Got device');
 		return device.gatt.connect();
