@@ -15,13 +15,13 @@ function log(str) {
 	document.querySelector('#log').innerHTML += str + '<br/>';
 }
 
-async function onBtnClick3() {
+function onBtnClick3() {
 	if (!ledCharacteristic) {
 		log('Char not defined');
 		return;
 	}
 	const resetEnergyExpended = Uint8Array.of(1);
-	await characteristic.writeValue(resetEnergyExpended);
+	characteristic.writeValue(resetEnergyExpended).then(_ => log('DONE'));
 }
 
 function onBtnClick2() {
