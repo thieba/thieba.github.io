@@ -85,6 +85,7 @@ background-color: var(--hold-4-color) !important;
 </head>
 <body>
 <header>
+<button onclick="onButtonClick()">TEST</button>
 	<h1 id="problemName">
 	</h1>
 </header>
@@ -111,19 +112,38 @@ background-color: var(--hold-4-color) !important;
   firebase.initializeApp(firebaseConfig);
 </script>
 <script>
-function onButtonClick() {
-let options = {acceptAllDevices: true};
+async function onButtonClick() {
+let options = {
+    filters: [
+        { namePrefix: 'LED' }
+    ],
+    optionalServices: [ '19b10000-e8f2-537e-4f6c-d104768a1214' ] };
   console.log('Requesting Bluetooth Device...');
   console.log('with ' + JSON.stringify(options));
-  navigator.bluetooth.requestDevice(options)
-  .then(device => {
-    console.log('> Name:             ' + device.name);
-    console.log('> Id:               ' + device.id);
-    console.log('> Connected:        ' + device.gatt.connected);
-  })
-  .catch(error => {
-    console.log('Argh! ' + error);
-  });
+  try {
+  let device = await navigator.bluetooth.requestDevice(options);
+  let server = await device.gatt.connect();
+  let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
+  let characteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
+  } catch (error) {
+	alert('Argh! ' + error);
+  }
+  alert(characteristic);
+  <!-- .then(device => { -->
+    <!-- console.log('> Name:             ' + device.name); -->
+    <!-- console.log('> Id:               ' + device.id); -->
+    <!-- console.log('> Connected:        ' + device.gatt.connected); -->
+	<!-- return device.gatt.connect(); -->
+  <!-- }) -->
+  <!-- .then(server => { -->
+	<!-- console.log(server); -->
+	<!-- return server.getPrimaryServices(); -->
+	<!-- }) -->
+  <!-- .then(service => service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214')) -->
+  <!-- .then(characteristic => consoloe.log(characteristic)) -->
+  <!-- .catch(error => { -->
+    <!-- console.log('Argh! ' + error); -->
+  <!-- }); -->
 }
 </script>
 <script>
