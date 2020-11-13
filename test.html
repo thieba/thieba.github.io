@@ -1,6 +1,6 @@
 <html>
 <body>
-	<button onclick="onButtonClick()">
+	<button onclick="onBtnClick2()">
 	TEST
 	</button>
 	<div id="log">
@@ -8,7 +8,30 @@
 </body>
 <script>
 function log(str) {
-	document.querySelector('#log').innerHTML += str;
+	document.querySelector('#log').innerHTML += str + '<br/>';
+}
+
+function onBtnClick2() {
+	navigator.bluetooth.requestDevice({ filters: [
+        { namePrefix: 'LED' }
+    ] })
+	.then(device => device.gatt.connect())
+	.then(server => server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214'))
+	.then(service => {
+		log('Got service');
+		return service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
+	})
+	.then(characteristic => {
+	  // Writing 1 is the signal to reset energy expended.
+	  log('Got char');
+	  const resetEnergyExpended = Uint8Array.of(1);
+	  return characteristic.writeValue(resetEnergyExpended);
+	})
+	.then(_ => {
+	  log('Energy expended has been reset.');
+	})
+	.catch(error => { console.error(error); });
+
 }
   
 function onButtonClick() {
