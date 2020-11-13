@@ -3,12 +3,25 @@
 	<button onclick="onBtnClick2()">
 	TEST
 	</button>
+		<button onclick="onBtnClick3()">
+	KLIGNOTE
+	</button>
 	<div id="log">
 	</div>
 </body>
 <script>
+var ledCharacteristic;
 function log(str) {
 	document.querySelector('#log').innerHTML += str + '<br/>';
+}
+
+async function onBtnClick3() {
+	if (!ledCharacteristic) {
+		log('Char not defined');
+		return;
+	}
+	const resetEnergyExpended = Uint8Array.of(1);
+	await characteristic.writeValue(resetEnergyExpended);
 }
 
 function onBtnClick2() {
@@ -28,6 +41,7 @@ function onBtnClick2() {
 	.then(characteristic => {
 	  // Writing 1 is the signal to reset energy expended.
 	  log('Got char');
+	  ledCharacteristic = characteristic;
 	  const resetEnergyExpended = Uint8Array.of(1);
 	  return characteristic.writeValue(resetEnergyExpended);
 	})
