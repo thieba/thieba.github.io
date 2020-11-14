@@ -130,9 +130,11 @@ try {
 	let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
 	log('Got service');
 	problemCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1217');
-	log('Got char2');
+	log('Got problem service');
 	ledCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1218');
-	log('Got char3');
+	log('Got led service');
+	resetCharacteristic = await service.getCharacteristic('19B10001-E8F2-537E-4F6C-D104768A1216');
+	log('Got reset service');
 } catch(error) {
 	log(error);
 	}
