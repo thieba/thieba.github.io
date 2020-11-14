@@ -148,6 +148,7 @@ const offsety = 20;
 const holdTypes = 4;
 
 async function setHold(index, type) {
+	try {
 	let hold = document.getElementById(index);
 	hold.setAttribute('type', type);
 	hold.setAttribute('class', 'hold-'+type);
@@ -162,6 +163,9 @@ async function setHold(index, type) {
 		const resetEnergyExpended = Uint8Array.of(index);
 		await ledCharacteristic.writeValue(resetEnergyExpended);
 		log('DONE');
+	}
+	} catch (error) {
+		log(error);
 	}
 }
 
