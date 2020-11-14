@@ -115,7 +115,7 @@ background-color: var(--hold-4-color) !important;
 </script>
 <script>
 var ledCharacteristic;
-var colorCharacteristic;
+var problemCharacteristic;
 var resetCharacteristic;
 function log(str) {
 	document.querySelector('#log').innerHTML += str + '<br/>';
@@ -129,20 +129,12 @@ try {
 	log('Got server');
 	let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
 	log('Got service');
-	let characteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
-	log('Got char');
-	let characteristic2 = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1215');
+	problemCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1217');
 	log('Got char2');
-	let characteristic3 = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1216');
+	ledCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1218');
 	log('Got char3');
-	ledCharacteristic = characteristic;
-	colorCharacteristic = characteristic2;
-	resetCharacteristic = characteristic3;
-	const resetEnergyExpended = Uint8Array.of(1);
-	await characteristic.writeValue(resetEnergyExpended);
-	log('Energy expended has been reset.');
 } catch(error) {
-	log(error); 
+	log(error);
 	}
 }
 
@@ -156,17 +148,10 @@ async function setHold(index, type) {
 	let hold = document.getElementById(index);
 	hold.setAttribute('type', type);
 	hold.setAttribute('class', 'hold-'+type);
-	if (type && type != 0 && colorCharacteristic) {
-	log('COLOR' + (type * 50));
-		const color = Uint8Array.of(type * 50);
-		await colorCharacteristic.writeValue(color);
-		log('DONE');	
-	}
-	if (type && type != 0 && ledCharacteristic) {
-		log('LIGHT' + index);
-		const lightIndex = Uint8Array.of(index);
-		await ledCharacteristic.writeValue(lightIndex);
-		log('DONE');
+	log('LIGHT' + index + ', COLOR' + (type * 50));
+	if (ledCharacteristic) {
+		const color = Uint8Array.of([index, type * 50]);
+		await ledCharacteristic.writeValue(color);
 	}
 	} catch (error) {
 		log(error);
@@ -193,8 +178,6 @@ console.log("column:" + myWall.columns + ", row:" + myWall.rows);
 }
 
 async function resetWall() {
-	const resetValue = Uint8Array.of(0);
-	await resetCharacteristic.writeValue(resetValue);
 	for (let i = 0; i < (myWall.rows * myWall.columns); i++) {
 		await setHold(i, 0);
 	}
