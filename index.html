@@ -154,14 +154,14 @@ async function setHold(index, type) {
 	hold.setAttribute('class', 'hold-'+type);
 	if (type && type != 0 && colorCharacteristic) {
 	log('COLOR' + index);
-		const resetEnergyExpended = Uint8Array.of(index);
-		await colorCharacteristic.writeValue(type * 50);
+		const color = Uint8Array.of(type * 50);
+		await colorCharacteristic.writeValue(color);
 		log('DONE');	
 	}
 	if (type && type != 0 && ledCharacteristic) {
 		log('LIGHT' + index);
-		const resetEnergyExpended = Uint8Array.of(index);
-		await ledCharacteristic.writeValue(resetEnergyExpended);
+		const lightIndex = Uint8Array.of(index);
+		await ledCharacteristic.writeValue(lightIndex);
 		log('DONE');
 	}
 	} catch (error) {
