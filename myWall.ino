@@ -60,6 +60,7 @@ void setup() {
 
   // set the initial value for the characeristic:
   switchCharacteristic.writeValue(0);
+  colorCharacteristic.writeValue(0);
 
   // start advertising
   BLE.advertise();
