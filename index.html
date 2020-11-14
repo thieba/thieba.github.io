@@ -95,6 +95,8 @@ background-color: var(--hold-4-color) !important;
 </div>
 <div id="wall">
 </div>
+<div id="log">
+</div>
 </body>
 <footer>
 <script>
@@ -112,41 +114,30 @@ background-color: var(--hold-4-color) !important;
   firebase.initializeApp(firebaseConfig);
 </script>
 <script>
-async function onButtonClick() {
-let options = {
-    filters: [
-        { namePrefix: 'LED' }
-    ],
-    optionalServices: [ '19b10000-e8f2-537e-4f6c-d104768a1214' ] };
-  console.log('Requesting Bluetooth Device...');
-  console.log('with ' + JSON.stringify(options));
-  try {
-  let device = await navigator.bluetooth.requestDevice(options);
-  let server = await device.gatt.connect();
-  let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
-  let characteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
-  } catch (error) {
-	alert('Argh! ' + error);
-  }
-  alert(characteristic);
-  <!-- .then(device => { -->
-    <!-- console.log('> Name:             ' + device.name); -->
-    <!-- console.log('> Id:               ' + device.id); -->
-    <!-- console.log('> Connected:        ' + device.gatt.connected); -->
-	<!-- return device.gatt.connect(); -->
-  <!-- }) -->
-  <!-- .then(server => { -->
-	<!-- console.log(server); -->
-	<!-- return server.getPrimaryServices(); -->
-	<!-- }) -->
-  <!-- .then(service => service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214')) -->
-  <!-- .then(characteristic => consoloe.log(characteristic)) -->
-  <!-- .catch(error => { -->
-    <!-- console.log('Argh! ' + error); -->
-  <!-- }); -->
+var ledCharacteristic;
+function log(str) {
+	document.querySelector('#log').innerHTML += str + '<br/>';
 }
-</script>
-<script>
+
+async function onButtonClick() {
+try {
+	let device = await navigator.bluetooth.requestDevice({filters: [{services: ['19b10000-e8f2-537e-4f6c-d104768a1214']}]})
+	log('Got device');
+	let server = await device.gatt.connect();
+	log('Got server');
+	let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
+	log('Got service');
+	let characteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
+	log('Got char');
+	ledCharacteristic = characteristic;
+	const resetEnergyExpended = Uint8Array.of(1);
+	await characteristic.writeValue(resetEnergyExpended);
+	log('Energy expended has been reset.');
+} catch(error) {
+	log(error); 
+	}
+}
+
 var myWall = { };
 const offsetx = 50;
 const offsety = 20;
@@ -156,6 +147,11 @@ function setHold(index, type) {
 	let hold = document.getElementById(index);
 	hold.setAttribute('type', type);
 	hold.setAttribute('class', 'hold-'+type);
+	if (type && type != 0 && ledCharacteristic) {
+		log('LIGHT' + index);
+		const resetEnergyExpended = Uint8Array.of(index);
+		ledCharacteristic.writeValue(resetEnergyExpended).then(_ => log('DONE'));
+	}
 }
 
 function drawWall() {
