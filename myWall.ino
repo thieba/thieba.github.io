@@ -16,15 +16,16 @@
 */
 
 #include <ArduinoBLE.h>
-// #include <FastLED.h>
-// #define LED_PIN     7
-// #define NUM_LEDS    120
-// CRGB leds[NUM_LEDS];
+#include <FastLED.h>
+#define LED_PIN     7
+#define NUM_LEDS    120
+CRGB leds[NUM_LEDS];
 
 BLEService ledService("19B10000-E8F2-537E-4F6C-D104768A1214"); // BLE LED Service
 
 // BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
-BLEByteCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
+BLEUnsignedCharCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
+BLEUnsignedCharCharacteristic colorCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1215", BLERead | BLEWrite);
 
 const int ledPin = LED_BUILTIN; // pin to use for the LED
 
@@ -32,9 +33,9 @@ void setup() {
   // Serial.begin(9600);
   // while (!Serial);
   
-  // FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
-  // leds[0] = CRGB(255, 255, 255);
-  // FastLED.show();
+  FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
+  leds[0] = CRGB(255, 255, 255);
+  FastLED.show();
 
   // set LED pin to output mode
   pinMode(ledPin, OUTPUT);
@@ -52,6 +53,7 @@ void setup() {
 
   // add the characteristic to the service
   ledService.addCharacteristic(switchCharacteristic);
+  ledService.addCharacteristic(colorCharacteristic);
 
   // add service
   BLE.addService(ledService);
@@ -66,42 +68,38 @@ void setup() {
 }
 
 void loop() {
-  //delay(20);
-  //leds[0] = CRGB(255, 0, 0);
-  //leds[1] = CRGB(0, 0, 0);
-  //leds[2] = CRGB(0, 0, 0);
-  //FastLED.show();
+  delay(20);
+  leds[0] = CRGB(255, 0, 0);
+  leds[1] = CRGB(0, 0, 0);
+  leds[2] = CRGB(0, 0, 0);
+  FastLED.show();
   // listen for BLE peripherals to connect:
   BLEDevice central = BLE.central();
 
   // if a central is connected to peripheral:
   if (central) {
+    static CHSV color = CHSV(0, 255, 255);
     // Serial.print("Connected to central: ");
     // // print the central's MAC address:
     // Serial.println(central.address());
     digitalWrite(ledPin, HIGH);         // will turn the LED on
-    //leds[1] = CRGB(0, 255, 0);
-    //FastLED.show();
-    //delay(20);
+    leds[1] = CRGB(0, 255, 0);
+    FastLED.show();
+    delay(20);
 
     // while the central is still connected to peripheral:
     while (central.connected()) {
       // if the remote device wrote to the characteristic,
       // use the value to control the LED:
       if (switchCharacteristic.written()) {
-        if (switchCharacteristic.value()) {   // any value other than 0
+        unsigned char c = switchCharacteristic.value();
           // Serial.println("LED on");
-          for (int i = 0; i < 10; i++)
-          {
-            digitalWrite(ledPin, LOW);
-            delay(100);
-            digitalWrite(ledPin, HIGH);
-            delay(100);
-          }
-        } else {                              // a 0 value
-          // Serial.println(F("LED off"));
-          
-        }
+          leds[c] = color;
+          FastLED.show();
+      }
+      if (colorCharacteristic.written()) {
+        unsigned char c = colorCharacteristic.value();
+        color = CHSV(c, 255, 255);
       }
     }
 

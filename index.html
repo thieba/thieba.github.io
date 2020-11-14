@@ -115,6 +115,7 @@ background-color: var(--hold-4-color) !important;
 </script>
 <script>
 var ledCharacteristic;
+var colorCharacteristic;
 function log(str) {
 	document.querySelector('#log').innerHTML += str + '<br/>';
 }
@@ -129,7 +130,10 @@ try {
 	log('Got service');
 	let characteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
 	log('Got char');
+	let characteristic2 = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
+	log('Got char2');
 	ledCharacteristic = characteristic;
+	colorCharacteristic = characteristic2;
 	const resetEnergyExpended = Uint8Array.of(1);
 	await characteristic.writeValue(resetEnergyExpended);
 	log('Energy expended has been reset.');
@@ -147,6 +151,12 @@ async function setHold(index, type) {
 	let hold = document.getElementById(index);
 	hold.setAttribute('type', type);
 	hold.setAttribute('class', 'hold-'+type);
+	if (type && type != 0 && colorCharacteristic) {
+	log('COLOR' + index);
+		const resetEnergyExpended = Uint8Array.of(index);
+		await colorCharacteristic.writeValue(type * 50);
+		log('DONE');	
+	}
 	if (type && type != 0 && ledCharacteristic) {
 		log('LIGHT' + index);
 		const resetEnergyExpended = Uint8Array.of(index);
@@ -186,15 +196,15 @@ async function setHoldType(holds, type) {
 	}
 }
 
-function setWall(index) {
-	resetWall();
+async function setWall(index) {
+	await resetWall();
 	const problem = myWall.problems[index];
 	problemName.innerHTML = problem.name;
 	const problemHolds = problem.holds;
-	setHoldType(problemHolds.starts, 1);
-	setHoldType(problemHolds.middles, 2);
-	setHoldType(problemHolds.finishes, 3);
-	setHoldType(problemHolds.feet, 4);
+	await setHoldType(problemHolds.starts, 1);
+	await setHoldType(problemHolds.middles, 2);
+	await setHoldType(problemHolds.finishes, 3);
+	await setHoldType(problemHolds.feet, 4);
 }
 
 function initializeWall(wall) {
@@ -207,8 +217,8 @@ function initializeWall(wall) {
 		console.log(problem);
 		const li = document.createElement('LI');
 		li.innerHTML =  problem.name + ' V' + problem.grade;
-		li.onclick = () => {
-			setWall(index);
+		li.onclick = async () => {
+			await setWall(index);
 		};
 		problemsElement.appendChild(li);
 	}
