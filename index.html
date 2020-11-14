@@ -178,9 +178,13 @@ console.log("column:" + myWall.columns + ", row:" + myWall.rows);
 }
 
 async function resetWall() {
-	resetCharacteristic.writeValue(0x00);
+	try {
+	resetCharacteristic.writeValue(Uint8Array.of(0));
 	for (let i = 0; i < (myWall.rows * myWall.columns); i++) {
 		await setHold(i, 0, true);
+	}
+	} catch (error) {
+		log(error);
 	}
 }
 
