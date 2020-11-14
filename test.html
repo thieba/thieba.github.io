@@ -3,6 +3,9 @@
 	<button onclick="onBtnClick2()">
 	TEST
 	</button>
+		<button onclick="onBtnClick4()">
+	TEST2
+	</button>
 		<button onclick="onBtnClick3()">
 	KLIGNOTE
 	</button>
@@ -50,6 +53,26 @@ function onBtnClick2() {
 	})
 	.catch(error => { log(error); });
 
+}
+
+async function onBtnClick4() {
+log('C\'est partiiiii');
+try {
+	let device = await navigator.bluetooth.requestDevice({filters: [{services: ['19b10000-e8f2-537e-4f6c-d104768a1214']}]})
+	log('Got device');
+	let server = await device.gatt.connect();
+	log('Got server');
+	let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
+	log('Got service');
+	let characteristic await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
+	log('Got char');
+	ledCharacteristic = characteristic;
+	const resetEnergyExpended = Uint8Array.of(1);
+	await characteristic.writeValue(resetEnergyExpended);
+	log('Energy expended has been reset.');
+} catch(error) {
+	log(error); 
+	}
 }
   
 function onButtonClick() {
