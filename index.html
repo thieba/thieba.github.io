@@ -150,8 +150,8 @@ async function setHold(index, type) {
 	hold.setAttribute('class', 'hold-'+type);
 	log('LIGHT' + index + ', COLOR' + (type * 50));
 	if (ledCharacteristic) {
-		const color = Uint8Array.of([index, type * 50]);
-		await ledCharacteristic.writeValue([index, type * 50]);
+		const color = Uint8Array.of(index, type * 50);
+		await ledCharacteristic.writeValue(color);
 	}
 	} catch (error) {
 		log(error);
