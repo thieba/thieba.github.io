@@ -24,7 +24,7 @@ function onBtnClick3() {
 		return;
 	}
 	const resetEnergyExpended = Uint8Array.of(1);
-	characteristic.writeValue(resetEnergyExpended).then(_ => log('DONE'));
+	ledCharacteristic.writeValue(resetEnergyExpended).then(_ => log('DONE'));
 }
 
 function onBtnClick2() {
