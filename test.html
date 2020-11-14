@@ -64,7 +64,7 @@ try {
 	log('Got server');
 	let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
 	log('Got service');
-	let characteristic await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
+	let characteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1214');
 	log('Got char');
 	ledCharacteristic = characteristic;
 	const resetEnergyExpended = Uint8Array.of(1);
