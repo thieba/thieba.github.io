@@ -143,18 +143,19 @@ const offsetx = 50;
 const offsety = 20;
 const holdTypes = 4;
 
-function setHold(index, type) {
+async function setHold(index, type) {
 	let hold = document.getElementById(index);
 	hold.setAttribute('type', type);
 	hold.setAttribute('class', 'hold-'+type);
 	if (type && type != 0 && ledCharacteristic) {
 		log('LIGHT' + index);
 		const resetEnergyExpended = Uint8Array.of(index);
-		ledCharacteristic.writeValue(resetEnergyExpended).then(_ => log('DONE'));
+		await ledCharacteristic.writeValue(resetEnergyExpended);
+		log('DONE');
 	}
 }
 
-function drawWall() {
+async function drawWall() {
 console.log("column:" + myWall.columns + ", row:" + myWall.rows);
 	for (let y = 0; y < myWall.rows; y++) {
 			const div = document.createElement("DIV");
@@ -166,22 +167,22 @@ console.log("column:" + myWall.columns + ", row:" + myWall.rows);
 				let hold = document.getElementById(x + y * myWall.columns);
 				let type = hold.getAttribute('type');
 				type = type !== null ? (++type % (holdTypes + 1)) : 1;
-				setHold(x + y * myWall.columns, type);
+				await setHold(x + y * myWall.columns, type);
 			};
 			div.appendChild(span);
 		}
 	}
 }
 
-function resetWall() {
+async function resetWall() {
 	for (let i = 0; i < (myWall.rows * myWall.columns); i++) {
-		setHold(i, 0);
+		await setHold(i, 0);
 	}
 }
 
-function setHoldType(holds, type) {
+async function setHoldType(holds, type) {
 	for (let hold of holds ) {
-		setHold(hold, type);
+		await setHold(hold, type);
 	}
 }
 
@@ -196,7 +197,7 @@ function setWall(index) {
 	setHoldType(problemHolds.feet, 4);
 }
 
-function initializeWall(wall) {
+async function initializeWall(wall) {
 	console.log(wall);
 	myWall = wall;
 	let problemsElement = document.getElementById('problems');
@@ -211,7 +212,7 @@ function initializeWall(wall) {
 		};
 		problemsElement.appendChild(li);
 	}
-	drawWall();
+	await drawWall();
 }
 
 const dbRefWall = firebase.database().ref().child('walls/jaimemebattre');
