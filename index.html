@@ -143,16 +143,16 @@ const offsetx = 50;
 const offsety = 20;
 const holdTypes = 4;
 
-async function setHold(index, type) {
+async function setHold(index, type, bypassDisplay) {
 	try {
-	let hold = document.getElementById(index);
-	hold.setAttribute('type', type);
-	hold.setAttribute('class', 'hold-'+type);
-	log('LIGHT' + index + ', COLOR' + (type * 50));
-	if (ledCharacteristic) {
-		const color = Uint8Array.of(index, type * 50);
-		await ledCharacteristic.writeValue(color);
-	}
+		let hold = document.getElementById(index);
+		hold.setAttribute('type', type);
+		hold.setAttribute('class', 'hold-'+type);
+		log('LIGHT' + index + ', COLOR' + (type * 50));
+		if (ledCharacteristic && !bypassDisplay) {
+			const color = Uint8Array.of(index, type * 50);
+			await ledCharacteristic.writeValue(color);
+		}
 	} catch (error) {
 		log(error);
 	}
@@ -178,8 +178,9 @@ console.log("column:" + myWall.columns + ", row:" + myWall.rows);
 }
 
 async function resetWall() {
+	resetCharacteristic.writeValue(0x00);
 	for (let i = 0; i < (myWall.rows * myWall.columns); i++) {
-		await setHold(i, 0);
+		await setHold(i, 0, true);
 	}
 }
 
