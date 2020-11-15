@@ -194,7 +194,7 @@ async function setHoldType(holds, type) {
 	for (let hold of holds ) {
 		await setHold(hold, type, true);
 	}
-	return [type * 50].concat(Uint8Array.from(holds)).concat(Uint8Array.of(0xFF));
+	return [type * 50].concat(holds).concat([0xFF]);
 }
 
 async function setWall(index) {
@@ -206,10 +206,11 @@ async function setWall(index) {
 	const middlesHolds = await setHoldType(problemHolds.middles, 2);
 	const finishesHolds = await setHoldType(problemHolds.finishes, 3);
 	const feetHolds =await setHoldType(problemHolds.feet, 4);
-	const problemHoldsValue = startsHolds
+	const problemHoldsValue = Uint8Array.from(startsHolds
 		.concat(middlesHolds)
 		.concat(finishesHolds)
-		.concat(feetHolds);
+		.concat(feetHolds));
+	console.log(problemHoldsValue);
 	await problemCharacteristic.writeValue(problemHoldsValue);
 }
 
