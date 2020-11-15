@@ -192,8 +192,9 @@ async function resetWall() {
 
 async function setHoldType(holds, type) {
 	for (let hold of holds ) {
-		await setHold(hold, type);
+		await setHold(hold, type, true);
 	}
+	return [type * 50].concat(Uint8Array.from(holds)).concat(Uint8Array.of(0xFF));
 }
 
 async function setWall(index) {
@@ -201,10 +202,15 @@ async function setWall(index) {
 	const problem = myWall.problems[index];
 	problemName.innerHTML = problem.name;
 	const problemHolds = problem.holds;
-	await setHoldType(problemHolds.starts, 1);
-	await setHoldType(problemHolds.middles, 2);
-	await setHoldType(problemHolds.finishes, 3);
-	await setHoldType(problemHolds.feet, 4);
+	const startsHolds = await setHoldType(problemHolds.starts, 1);
+	const middlesHolds = await setHoldType(problemHolds.middles, 2);
+	const finishesHolds = await setHoldType(problemHolds.finishes, 3);
+	const feetHolds =await setHoldType(problemHolds.feet, 4);
+	const problemHoldsValue = startsHolds
+		.concat(middlesHolds)
+		.concat(finishesHolds)
+		.concat(feetHolds);
+	await problemCharacteristic.writeValue(problemHoldsValue);
 }
 
 function initializeWall(wall) {
