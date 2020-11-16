@@ -1,239 +1,292 @@
 <html>
+
 <head>
-<meta name="viewport" content="width=device-width, user-scalable=no">
-<style>
-:root {
-	--hold-1-color: #27AE61;
-	--hold-2-color: #2C97DF;
-	--hold-3-color: #E84C3D;
-	--hold-4-color: #FF416D;
-	--header-height: 5rem;
-	--wall-columns: 15;
-	--wall-rows: 7;
-}
-@media screen and (max-width: 1000px) {
-  :root {
-    font-size: 1em;
-  }
-}
-body {
-	margin: 0;
-	background-color: #1f203e;
-}
-ul {
-    margin: 0;
-    padding: 0;
-}
-li {
-	border: solid 1px black;
-	background-color: grey;
-	padding: 1rem;
-	cursor: pointer;
-	font-size: 1.2rem;
-	font-weight: 600;
-}
-#wall {
-    display: flex;
-	height: calc(98vh - var(--header-height));
-    flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	background: url(wall.png);
-	width: fit-content;
-	background-size: 100% 100%;
-    margin: auto;
-}
-#wall > div {
-	padding: 0 10px;
-    justify-content: center;
-    display: flex;
-	flex-grow: 1;
-	width: calc(var(--wall-rows)*(100vh - var(--header-height))/ var(--wall-columns));
-}
-header {
-    width: 100%;
-    height: var(--header-height);
-    background-color: #A4783A;
-}
-span {
-//width: 2.4rem;
-flex-grow: 1;
-height: 100%;
-//height: 2.4rem;
-display: inline-block;
-border-radius: 100px;
-text-align: center;
-border: solid 1px black;
-margin: 0px 1px;
-opacity: 0.5;
-}
-.hold-1 {
-background-color: var(--hold-1-color) !important;
-}
-.hold-2 {
-background-color: var(--hold-2-color) !important;
-}
-.hold-3 {
-background-color: var(--hold-3-color) !important;
-}
-.hold-4 {
-background-color: var(--hold-4-color) !important;
-}
-</style>
-<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
+	<meta name="viewport" content="width=device-width, user-scalable=no">
+	<style>
+		:root {
+			--hold-1-color: #27AE61;
+			--hold-2-color: #2C97DF;
+			--hold-3-color: #E84C3D;
+			--hold-4-color: #FF416D;
+			--header-height: 5rem;
+			--wall-columns: 15;
+			--wall-rows: 7;
+		}
+
+		@font-face {
+			font-family: Poppins;
+			src: url(Poppins-Regular.ttf);
+		}
+
+
+		@media screen and (max-width: 1000px) {
+			:root {
+				font-size: 1em;
+			}
+		}
+
+		body {
+			font-family: Poppins;
+			height: 100vh;
+			margin: 0;
+			background-color: #F6F7FB;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.bluetooth {
+			margin: 15px;
+			background-image: url('bluetooth.svg');
+			background-size: 100% 100%;
+			border-radius: 100%;
+			width: 3rem;
+			height: 3rem;
+			border: 0;
+			background-repeat: no-repeat;
+			border: solid 4px transparent;
+		}
+
+		.active {
+			background-color: #00c4ff;
+		}
+
+		ul {
+			margin: 0;
+			padding: 0;
+		}
+
+		li {
+			border: solid 1px black;
+			background-color: white;
+			padding: 1rem;
+			cursor: pointer;
+			font-size: 1.2rem;
+			font-weight: 400;
+			border: 0;
+			border-radius: 20px;
+			margin: 10px;
+			list-style-type: none;
+		}
+
+		#wall {
+			border-radius: 12px;
+			display: flex;
+			flex-grow: 1;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			background: url(wall.png);
+			width: fit-content;
+			background-size: 100% 100%;
+			margin: auto;
+		}
+
+		#wall>div {
+			padding: 0 10px;
+			justify-content: center;
+			display: flex;
+			flex-grow: 1;
+			width: calc(var(--wall-rows)*(100vh - var(--header-height) - 50px)/ var(--wall-columns));
+		}
+
+		header {
+			width: 100%;
+			height: var(--header-height);
+			background-color: white;
+			display: flex;
+			flex-direction: row;
+		}
+
+		h1 {
+			flex-grow: 1;
+		}
+
+		span {
+			//width: 2.4rem;
+			flex-grow: 1;
+			height: 100%;
+			//height: 2.4rem;
+			display: inline-block;
+			border-radius: 100px;
+			text-align: center;
+			//border: solid 1px black;
+			margin: 0px 1px;
+			opacity: 0.5;
+		}
+
+		.hold-1 {
+			background-color: var(--hold-1-color) !important;
+		}
+
+		.hold-2 {
+			background-color: var(--hold-2-color) !important;
+		}
+
+		.hold-3 {
+			background-color: var(--hold-3-color) !important;
+		}
+
+		.hold-4 {
+			background-color: var(--hold-4-color) !important;
+		}
+	</style>
+	<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.0.1/firebase-database.js"></script>
 </head>
+
 <body>
-<header>
-<button onclick="onButtonClick()">TEST</button>
-	<h1 id="problemName">
-	</h1>
-</header>
-<div>
-	<ul id="problems">
-	</ul>
-</div>
-<div id="wall">
-</div>
-<div id="log">
-</div>
+	<header>
+		<h1 id="problemName">
+		</h1>
+		<button class="bluetooth" onclick="onButtonClick()"></button>
+	</header>
+	<div>
+		<ul id="problems">
+		</ul>
+	</div>
+	<div id="wall">
+	</div>
+	<!-- <div id="log">
+	</div> -->
 </body>
 <footer>
-<script>
-  // Your web app's Firebase configuration
-  var firebaseConfig = {
-    apiKey: "AIzaSyBmqA8z73bbjcv65MxWKDYFlzAmSqt0PFA",
-    authDomain: "myclimbingwall-fc0e9.firebaseapp.com",
-    databaseURL: "https://myclimbingwall-fc0e9.firebaseio.com",
-    projectId: "myclimbingwall-fc0e9",
-    storageBucket: "myclimbingwall-fc0e9.appspot.com",
-    messagingSenderId: "39971715404",
-    appId: "1:39971715404:web:2af0c94f84f0841b1337e9"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-</script>
-<script>
-var ledCharacteristic;
-var problemCharacteristic;
-var resetCharacteristic;
-function log(str) {
-	document.querySelector('#log').innerHTML += str + '<br/>';
-}
-
-async function onButtonClick() {
-try {
-	let device = await navigator.bluetooth.requestDevice({filters: [{services: ['19b10000-e8f2-537e-4f6c-d104768a1214']}]})
-	log('Got device');
-	let server = await device.gatt.connect();
-	log('Got server');
-	let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
-	log('Got service');
-	problemCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1217');
-	log('Got problem service');
-	ledCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1218');
-	log('Got led service');
-	resetCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1216');
-	log('Got reset service');
-} catch(error) {
-	log(error);
-	}
-}
-
-var myWall = { };
-const offsetx = 50;
-const offsety = 20;
-const holdTypes = 4;
-
-async function setHold(index, type, bypassDisplay) {
-	try {
-		let hold = document.getElementById(index);
-		hold.setAttribute('type', type);
-		hold.setAttribute('class', 'hold-'+type);
-		log('LIGHT' + index + ', COLOR' + (type * 50));
-		if (ledCharacteristic && !bypassDisplay) {
-			const color = Uint8Array.of(index, type * 50);
-			await ledCharacteristic.writeValue(color);
-		}
-	} catch (error) {
-		log(error);
-	}
-}
-
-function drawWall() {
-console.log("column:" + myWall.columns + ", row:" + myWall.rows);
-	for (let y = 0; y < myWall.rows; y++) {
-			const div = document.createElement("DIV");
-			document.getElementById("wall").appendChild(div);
-		for (let x = 0; x < myWall.columns; x++) {
-			const span = document.createElement("SPAN");
-			span.id = x + y * myWall.columns;
-			span.onclick = async () => {
-				let hold = document.getElementById(x + y * myWall.columns);
-				let type = hold.getAttribute('type');
-				type = type !== null ? (++type % (holdTypes + 1)) : 1;
-				await setHold(x + y * myWall.columns, type);
-			};
-			div.appendChild(span);
-		}
-	}
-}
-
-async function resetWall() {
-	try {
-	resetCharacteristic.writeValue(Uint8Array.of(0));
-	for (let i = 0; i < (myWall.rows * myWall.columns); i++) {
-		await setHold(i, 0, true);
-	}
-	} catch (error) {
-		log(error);
-	}
-}
-
-async function setHoldType(holds, type) {
-	for (let hold of holds ) {
-		await setHold(hold, type, true);
-	}
-	return [type * 50].concat(holds).concat([0xFF]);
-}
-
-async function setWall(index) {
-	await resetWall();
-	const problem = myWall.problems[index];
-	problemName.innerHTML = problem.name;
-	const problemHolds = problem.holds;
-	const startsHolds = await setHoldType(problemHolds.starts, 1);
-	const middlesHolds = await setHoldType(problemHolds.middles, 2);
-	const finishesHolds = await setHoldType(problemHolds.finishes, 3);
-	const feetHolds =await setHoldType(problemHolds.feet, 4);
-	const problemHoldsValue = Uint8Array.from(startsHolds
-		.concat(middlesHolds)
-		.concat(finishesHolds)
-		.concat(feetHolds));
-	console.log(problemHoldsValue);
-	await problemCharacteristic.writeValue(problemHoldsValue);
-}
-
-function initializeWall(wall) {
-	console.log(wall);
-	myWall = wall;
-	let problemsElement = document.getElementById('problems');
-	for (let index in wall.problems) {
-		index = parseInt(index);
-		const problem = wall.problems[index];
-		console.log(problem);
-		const li = document.createElement('LI');
-		li.innerHTML =  problem.name + ' V' + problem.grade;
-		li.onclick = async () => {
-			await setWall(index);
+	<script>
+		// Your web app's Firebase configuration
+		var firebaseConfig = {
+			apiKey: "AIzaSyBmqA8z73bbjcv65MxWKDYFlzAmSqt0PFA",
+			authDomain: "myclimbingwall-fc0e9.firebaseapp.com",
+			databaseURL: "https://myclimbingwall-fc0e9.firebaseio.com",
+			projectId: "myclimbingwall-fc0e9",
+			storageBucket: "myclimbingwall-fc0e9.appspot.com",
+			messagingSenderId: "39971715404",
+			appId: "1:39971715404:web:2af0c94f84f0841b1337e9"
 		};
-		problemsElement.appendChild(li);
-	}
-	drawWall();
-}
+		// Initialize Firebase
+		firebase.initializeApp(firebaseConfig);
+	</script>
+	<script>
+		var ledCharacteristic;
+		var problemCharacteristic;
+		var resetCharacteristic;
+		function log(str) {
+			document.querySelector('#log').innerHTML += str + '<br/>';
+		}
 
-const dbRefWall = firebase.database().ref().child('walls/jaimemebattre');
-dbRefWall.once('value', (snap) => initializeWall(snap.val()));
-</script>
+		async function onButtonClick() {
+			try {
+				let device = await navigator.bluetooth.requestDevice({ filters: [{ services: ['19b10000-e8f2-537e-4f6c-d104768a1214'] }] })
+				log('Got device');
+				let server = await device.gatt.connect();
+				log('Got server');
+				let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
+				log('Got service');
+				problemCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1217');
+				log('Got problem service');
+				ledCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1218');
+				log('Got led service');
+				resetCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1216');
+				log('Got reset service');
+				document.getElementsByClassName('bluetooth')[0].setAttribute('class', 'bluetooth active');
+			} catch (error) {
+				log(error);
+			}
+		}
+
+		var myWall = {};
+		const offsetx = 50;
+		const offsety = 20;
+		const holdTypes = 4;
+
+		async function setHold(index, type, bypassDisplay) {
+			try {
+				let hold = document.getElementById(index);
+				hold.setAttribute('type', type);
+				hold.setAttribute('class', 'hold-' + type);
+				log('LIGHT' + index + ', COLOR' + (type * 50));
+				if (ledCharacteristic && !bypassDisplay) {
+					const color = Uint8Array.of(index, type * 50);
+					await ledCharacteristic.writeValue(color);
+				}
+			} catch (error) {
+				log(error);
+			}
+		}
+
+		function drawWall() {
+			console.log("column:" + myWall.columns + ", row:" + myWall.rows);
+			for (let y = 0; y < myWall.rows; y++) {
+				const div = document.createElement("DIV");
+				document.getElementById("wall").appendChild(div);
+				for (let x = 0; x < myWall.columns; x++) {
+					const span = document.createElement("SPAN");
+					span.id = x + y * myWall.columns;
+					span.onclick = async () => {
+						let hold = document.getElementById(x + y * myWall.columns);
+						let type = hold.getAttribute('type');
+						type = type !== null ? (++type % (holdTypes + 1)) : 1;
+						await setHold(x + y * myWall.columns, type);
+					};
+					div.appendChild(span);
+				}
+			}
+		}
+
+		async function resetWall() {
+			try {
+				resetCharacteristic.writeValue(Uint8Array.of(0));
+				for (let i = 0; i < (myWall.rows * myWall.columns); i++) {
+					await setHold(i, 0, true);
+				}
+			} catch (error) {
+				log(error);
+			}
+		}
+
+		async function setHoldType(holds, type) {
+			for (let hold of holds) {
+				await setHold(hold, type, true);
+			}
+			return [type * 50].concat(holds).concat([0xFF]);
+		}
+
+		async function setWall(index) {
+			await resetWall();
+			const problem = myWall.problems[index];
+			problemName.innerHTML = problem.name;
+			const problemHolds = problem.holds;
+			const startsHolds = await setHoldType(problemHolds.starts, 1);
+			const middlesHolds = await setHoldType(problemHolds.middles, 2);
+			const finishesHolds = await setHoldType(problemHolds.finishes, 3);
+			const feetHolds = await setHoldType(problemHolds.feet, 4);
+			const problemHoldsValue = Uint8Array.from(startsHolds
+				.concat(middlesHolds)
+				.concat(finishesHolds)
+				.concat(feetHolds));
+			console.log(problemHoldsValue);
+			await problemCharacteristic.writeValue(problemHoldsValue);
+		}
+
+		function initializeWall(wall) {
+			console.log(wall);
+			myWall = wall;
+			let problemsElement = document.getElementById('problems');
+			for (let index in wall.problems) {
+				index = parseInt(index);
+				const problem = wall.problems[index];
+				console.log(problem);
+				const li = document.createElement('LI');
+				li.innerHTML = problem.name + ' V' + problem.grade;
+				li.onclick = async () => {
+					await setWall(index);
+				};
+				problemsElement.appendChild(li);
+			}
+			drawWall();
+		}
+
+		const dbRefWall = firebase.database().ref().child('walls/jaimemebattre');
+		dbRefWall.once('value', (snap) => initializeWall(snap.val()));
+	</script>
 </footer>
+
 </html>
