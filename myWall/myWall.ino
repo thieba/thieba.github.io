@@ -24,13 +24,13 @@ CRGB leds[NUM_LEDS];
 BLEService ledService("19B10000-E8F2-537E-4F6C-D104768A1214"); // BLE LED Service
 
 // BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
-BLEUnsignedCharCharacteristic switchCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1214", BLERead | BLEWrite);
-BLEUnsignedCharCharacteristic colorCharacteristic("19B10001-E8F2-537E-4F6C-D104768A1215", BLERead | BLEWrite);
+BLEUnsignedCharCharacteristic switchCharacteristic("00002a37-0000-1000-8000-00805f9b34fb", BLERead | BLEWrite);
+BLEUnsignedCharCharacteristic colorCharacteristic("00001803-0000-1000-8000-00805f9b34fb", BLERead | BLEWrite);
 
 const int ledPin = LED_BUILTIN; // pin to use for the LED
 
 void setup() {
-  // Serial.begin(9600);
+  Serial.begin(9600);
   // while (!Serial);
   
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
@@ -42,7 +42,7 @@ void setup() {
 
   // begin initialization
   if (!BLE.begin()) {
-    // Serial.println("starting BLE failed!");
+    Serial.println("starting BLE failed!");
 
     while (1);
   }
@@ -65,7 +65,7 @@ void setup() {
   // start advertising
   BLE.advertise();
 
-  // Serial.println("BLE LED Peripheral");
+  Serial.println("BLE LED Peripheral");
 }
 
 void loop() {
@@ -80,9 +80,9 @@ void loop() {
   // if a central is connected to peripheral:
   if (central) {
     static CHSV color = CHSV(0, 255, 255);
-    // Serial.print("Connected to central: ");
+    Serial.print("Connected to central: ");
     // // print the central's MAC address:
-    // Serial.println(central.address());
+    Serial.println(central.address());
     digitalWrite(ledPin, HIGH);         // will turn the LED on
     leds[1] = CRGB(0, 255, 0);
     FastLED.show();
@@ -94,7 +94,8 @@ void loop() {
       // use the value to control the LED:
       if (switchCharacteristic.written()) {
         unsigned char c = switchCharacteristic.value();
-          // Serial.println("LED on");
+          Serial.println(c);
+          Serial.println("LED on");
           leds[c] = color;
           FastLED.show();
       }
@@ -105,8 +106,8 @@ void loop() {
     }
 
     // when the central disconnects, print it out:
-    // Serial.print(F("Disconnected from central: "));
-    // Serial.println(central.address());
+    Serial.print(F("Disconnected from central: "));
+    Serial.println(central.address());
   }
   digitalWrite(ledPin, LOW);          // will turn the LED off
 }

@@ -115,20 +115,20 @@
 		}
 
 		span {
-			//width: 2.4rem;
+			/* width: 2.4rem; */
 			flex-grow: 1;
 			height: 100%;
-			//height: 2.4rem;
+			/* height: 2.4rem; */
 			display: inline-block;
 			border-radius: 100px;
 			text-align: center;
-			//border: solid 1px black;
+			/* border: solid 1px black; */
 			margin: 0px 1px;
 			opacity: 0.5;
 		}
 
 		#log {
-			display: none;
+			/* display: none; */
 		}
 
 		.hold-1 {
@@ -182,7 +182,7 @@
 		firebase.initializeApp(firebaseConfig);
 	</script>
 	<script>
-		var ledCharacteristic;
+		var colorCharacteristic;
 		var problemCharacteristic;
 		var resetCharacteristic;
 		function log(str) {
@@ -197,12 +197,12 @@
 				log('Got server');
 				let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
 				log('Got service');
-				problemCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1217');
+				problemCharacteristic = await service.getCharacteristic('00002a37-0000-1000-8000-00805f9b34fb');
 				log('Got problem service');
-				ledCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1218');
+				colorCharacteristic = await service.getCharacteristic('00001803-0000-1000-8000-00805f9b34fb');
 				log('Got led service');
-				resetCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1216');
-				log('Got reset service');
+				// resetCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1216');
+				// log('Got reset service');
 				document.getElementsByClassName('bluetooth')[0].setAttribute('class', 'bluetooth active');
 			} catch (error) {
 				log(error);
@@ -220,9 +220,9 @@
 				hold.setAttribute('type', type);
 				hold.setAttribute('class', 'hold-' + type);
 				log('LIGHT' + index + ', COLOR' + (type * 50));
-				if (ledCharacteristic && !bypassDisplay) {
+				if (colorCharacteristic && !bypassDisplay) {
 					const color = Uint8Array.of(index, type * 50);
-					await ledCharacteristic.writeValue(color);
+					await colorCharacteristic.writeValue(color);
 				}
 			} catch (error) {
 				log(error);
