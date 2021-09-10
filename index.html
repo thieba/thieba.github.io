@@ -80,6 +80,7 @@
 			width: fit-content;
 			background-size: 100% 100%;
 			margin: auto;
+			flex-direction: column-reverse;
 		}
 
 		#wall>div {
@@ -88,6 +89,16 @@
 			display: flex;
 			flex-grow: 1;
 			width: calc(var(--wall-rows)*(100vh - var(--header-height) - 50px)/ var(--wall-columns));
+			flex-direction: row-reverse;
+		}
+
+		#wall>div:nth-child(2n) {
+			padding: 0 10px;
+			justify-content: center;
+			display: flex;
+			flex-grow: 1;
+			width: calc(var(--wall-rows)*(100vh - var(--header-height) - 50px)/ var(--wall-columns));
+			flex-direction: row;
 		}
 
 		header {

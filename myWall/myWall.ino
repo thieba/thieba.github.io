@@ -18,7 +18,7 @@
 #include <ArduinoBLE.h>
 #include <FastLED.h>
 #define LED_PIN     7
-#define NUM_LEDS    120
+#define NUM_LEDS    105
 CRGB leds[NUM_LEDS];
 
 BLEService ledService("19B10000-E8F2-537E-4F6C-D104768A1214"); // BLE LED Service
