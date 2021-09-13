@@ -304,9 +304,8 @@
 			return [hueHolds[type]].concat(holds).concat([0xFF]);
 		}
 
-		async function setWall(index) {
+		async function setWall(problem) {
 			//await resetWall();
-			const problem = myWall.problems[index];
 			problemName.innerHTML = problem.name;
 			const problemHolds = problem.holds;
 			const startsHolds = await setHoldType(problemHolds.starts, 1);
@@ -327,14 +326,15 @@
 			console.log(wall);
 			myWall = wall;
 			let problemsElement = document.getElementById('problems');
+			let problems = [];
 			for (let index in wall.problems) {
-				//index = parseInt(index);
-				const problem = wall.problems[index];
-				console.log(problem);
+				problems.push(wall.problems[index]);
+			}
+			for (let problem of problems.sort((a, b) => a.grade - b.grade)) {
 				const li = document.createElement('LI');
 				li.innerHTML = problem.name + ' V' + problem.grade;
 				li.onclick = async () => {
-					await setWall(index);
+					await setWall(problem);
 				};
 				problemsElement.appendChild(li);
 			}
