@@ -20,18 +20,19 @@
 #define LED_PIN     7
 #define NUM_LEDS    105
 CRGB leds[NUM_LEDS];
+int BUFFER_SIZE = (NUM_LEDS + 2) * 4;
 
 BLEService ledService("19B10000-E8F2-537E-4F6C-D104768A1214"); // BLE LED Service
 
 // BLE LED Switch Characteristic - custom 128-bit UUID, read and writable by central
-BLEUnsignedCharCharacteristic switchCharacteristic("00002a37-0000-1000-8000-00805f9b34fb", BLERead | BLEWrite);
-BLEUnsignedCharCharacteristic colorCharacteristic("00001803-0000-1000-8000-00805f9b34fb", BLERead | BLEWrite);
+BLECharacteristic switchCharacteristic("00001803-0000-1000-8000-00805f9b34fb", BLERead | BLEWrite, BUFFER_SIZE);
+//BLEWordCharacteristic colorCharacteristic("00001803-0000-1000-8000-00805f9b34fb", BLERead | BLEWrite);
 
 const int ledPin = LED_BUILTIN; // pin to use for the LED
 
 void setup() {
-  Serial.begin(9600);
-  // while (!Serial);
+//  Serial.begin(9600);
+//  while (!Serial);
   
   FastLED.addLeds<WS2812B, LED_PIN, GRB>(leds, NUM_LEDS);
   leds[0] = CRGB(255, 255, 255);
@@ -53,14 +54,14 @@ void setup() {
 
   // add the characteristic to the service
   ledService.addCharacteristic(switchCharacteristic);
-  ledService.addCharacteristic(colorCharacteristic);
+  //ledService.addCharacteristic(colorCharacteristic);
 
   // add service
   BLE.addService(ledService);
 
   // set the initial value for the characeristic:
-  switchCharacteristic.writeValue(0);
-  colorCharacteristic.writeValue(0);
+  //switchCharacteristic.writeValue(0);
+  //colorCharacteristic.writeValue(0);
 
   // start advertising
   BLE.advertise();
@@ -93,15 +94,35 @@ void loop() {
       // if the remote device wrote to the characteristic,
       // use the value to control the LED:
       if (switchCharacteristic.written()) {
-        unsigned char c = switchCharacteristic.value();
-          Serial.println(c);
-          Serial.println("LED on");
-          leds[c] = color;
+          //for (int i = 0 ; i < NUM_LEDS ; i++) {
+          //  leds[i] = CRGB(0, 0, 0);
+          //}
+          FastLED.clear();
+          byte buffer[BUFFER_SIZE];
+          int typeEnds = 0;
+          int length = switchCharacteristic.readValue(buffer, BUFFER_SIZE);
+          int i = 0;
+          while (i < length && typeEnds < 4) {
+            int typeIndex = 0;
+            Serial.println("New Type");
+            while (buffer[i + typeIndex] != 0xFF && i < length) {
+              if (typeIndex == 0) {
+                Serial.println("New Color");
+                Serial.println(buffer[i + typeIndex]);
+                color = CHSV(buffer[i + typeIndex], 255, 255);
+              } else {
+                int position = buffer[i + typeIndex];
+                leds[position] = color;
+                Serial.println("Position");
+                Serial.println(position);
+              }
+              typeIndex++;
+            }
+            i += (typeIndex + 1);
+            typeEnds++;
+          }
+          Serial.println("Show led");
           FastLED.show();
-      }
-      if (colorCharacteristic.written()) {
-        unsigned char c = colorCharacteristic.value();
-        color = CHSV(c, 255, 255);
       }
     }
 

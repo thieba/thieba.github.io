@@ -76,11 +76,12 @@
 			flex-direction: column;
 			justify-content: center;
 			align-items: center;
-			background: url(wall.png);
+			background: url(wall.jpg);
 			width: fit-content;
 			background-size: 100% 100%;
 			margin: auto;
 			flex-direction: column-reverse;
+			display: none;
 		}
 
 		#wall>div {
@@ -128,7 +129,7 @@
 		}
 
 		#log {
-			/* display: none; */
+			display: none;
 		}
 
 		.hold-1 {
@@ -155,6 +156,13 @@
 	<header>
 		<h1 id="problemName">
 		</h1>
+		<div style="display: none">
+			NAME
+			<input type="text" id="nameInput"/>
+			V
+			<input type="number" id="gradeInput" />
+			<button onclick="onSaveClick()">save</button>
+		</div>
 		<button class="bluetooth" onclick="onButtonClick()"></button>
 	</header>
 	<div>
@@ -197,10 +205,11 @@
 				log('Got server');
 				let service = await server.getPrimaryService('19b10000-e8f2-537e-4f6c-d104768a1214');
 				log('Got service');
-				problemCharacteristic = await service.getCharacteristic('00002a37-0000-1000-8000-00805f9b34fb');
+				// colorCharacteristic = await service.getCharacteristic('00002a37-0000-1000-8000-00805f9b34fb');
+				// log('Got led service');
+				// colorCharacteristic.writeValue(0x50);
+				problemCharacteristic = await service.getCharacteristic('00001803-0000-1000-8000-00805f9b34fb');
 				log('Got problem service');
-				colorCharacteristic = await service.getCharacteristic('00001803-0000-1000-8000-00805f9b34fb');
-				log('Got led service');
 				// resetCharacteristic = await service.getCharacteristic('19b10001-e8f2-537e-4f6c-d104768a1216');
 				// log('Got reset service');
 				document.getElementsByClassName('bluetooth')[0].setAttribute('class', 'bluetooth active');
@@ -213,20 +222,49 @@
 		const offsetx = 50;
 		const offsety = 20;
 		const holdTypes = 4;
+		const hueHolds = {
+			1: 96,
+			2: 160,
+			3: 0,
+			4: 224
+		}
 
 		async function setHold(index, type, bypassDisplay) {
 			try {
 				let hold = document.getElementById(index);
 				hold.setAttribute('type', type);
 				hold.setAttribute('class', 'hold-' + type);
-				log('LIGHT' + index + ', COLOR' + (type * 50));
+				log('LIGHT' + index + ', COLOR' + (hueHolds[type]));
 				if (colorCharacteristic && !bypassDisplay) {
-					const color = Uint8Array.of(index, type * 50);
-					await colorCharacteristic.writeValue(color);
+					const color = Uint8Array.of(index, hueHolds[type]);
+					//await colorCharacteristic.writeValue(color);
 				}
 			} catch (error) {
 				log(error);
 			}
+		}
+
+		function getTypeHolds(type) {
+			return Array.from(document.querySelectorAll('[type="' + type + '"]')).map(x => +x.id);
+		}
+
+		function onSaveClick() {
+			console.log('save');
+			let problem = {};
+			problem.name = document.getElementById('nameInput').value;
+			problem.grade = +document.getElementById('gradeInput').value
+			problem.holds = {};
+			problem.holds.starts = getTypeHolds(1);
+			problem.holds.middles = getTypeHolds(2);
+			problem.holds.finishes = getTypeHolds(3);
+			problem.holds.feet = getTypeHolds(4);
+			console.log(problem);
+
+			let newProblemKey = firebase.database().ref().child('walls/jaimemebattre/problems').push().key;
+			let updates = {};
+			updates['/walls/jaimemebattre/problems/problem' + newProblemKey] = problem;
+
+			firebase.database().ref().update(updates);
 		}
 
 		function drawWall() {
@@ -250,7 +288,7 @@
 
 		async function resetWall() {
 			try {
-				resetCharacteristic.writeValue(Uint8Array.of(0));
+				//resetCharacteristic.writeValue(Uint8Array.of(0));
 				for (let i = 0; i < (myWall.rows * myWall.columns); i++) {
 					await setHold(i, 0, true);
 				}
@@ -260,10 +298,10 @@
 		}
 
 		async function setHoldType(holds, type) {
-			for (let hold of holds) {
-				await setHold(hold, type, true);
-			}
-			return [type * 50].concat(holds).concat([0xFF]);
+			// for (let hold of holds) {
+			// 	await setHold(hold, type, true);
+			// }
+			return [hueHolds[type]].concat(holds).concat([0xFF]);
 		}
 
 		async function setWall(index) {
@@ -280,7 +318,9 @@
 				.concat(finishesHolds)
 				.concat(feetHolds));
 			console.log(problemHoldsValue);
-			await problemCharacteristic.writeValue(problemHoldsValue);
+			if (problemCharacteristic) {
+				await problemCharacteristic.writeValue(problemHoldsValue);
+			}
 		}
 
 		function initializeWall(wall) {
@@ -288,7 +328,7 @@
 			myWall = wall;
 			let problemsElement = document.getElementById('problems');
 			for (let index in wall.problems) {
-				index = parseInt(index);
+				//index = parseInt(index);
 				const problem = wall.problems[index];
 				console.log(problem);
 				const li = document.createElement('LI');
